@@ -23,10 +23,10 @@ export default function GettingStarted() {
                 </li>
                 <li>
                   <a
-                    href="#first-frame"
+                    href="#basic-usage"
                     className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
                   >
-                    Your First Frame
+                    Basic Usage
                   </a>
                 </li>
                 <li>
@@ -64,304 +64,235 @@ export default function GettingStarted() {
             </h1>
 
             <div className="prose dark:prose-invert max-w-none">
-              <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                This guide will help you get up and running with VSTP quickly.
-                We'll cover installation, basic usage, and your first working
-                examples.
-              </p>
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-8">
+                <h4 className="text-yellow-900 dark:text-yellow-100 font-semibold mb-2">
+                  ⚡ Quick Tip
+                </h4>
+                <p className="text-yellow-700 dark:text-yellow-200">
+                  VSTP v0.2.1 introduces a new simplified API that makes it much
+                  easier to build networked applications. This guide focuses on
+                  the new API.
+                </p>
+              </div>
 
               <section id="installation">
                 <h2>Installation</h2>
                 <p>
-                  VSTP is a Rust library that you can add to your project using
-                  Cargo. Add the following to your <code>Cargo.toml</code>:
+                  Add VSTP to your project by adding the following to your{" "}
+                  <code>Cargo.toml</code>:
                 </p>
 
                 <pre className="bg-gray-900 p-4 rounded-lg">
                   <code>{`[dependencies]
-vstp = "0.1.0"
+vstp = "0.2.1"
 tokio = { version = "1.0", features = ["full"] }
-bytes = "1.0"`}</code>
+serde = { version = "1.0", features = ["derive"] }`}</code>
+                </pre>
+              </section>
+
+              <section id="basic-usage">
+                <h2>Basic Usage</h2>
+                <p>
+                  VSTP v0.2.1 makes it incredibly easy to send and receive typed
+                  messages. Here's a simple example:
+                </p>
+
+                <pre className="bg-gray-900 p-4 rounded-lg">
+                  <code>{`use serde::{Serialize, Deserialize};
+use vstp::easy::{VstpClient, VstpServer};
+
+#[derive(Serialize, Deserialize)]
+struct Message {
+    content: String,
+}
+
+// Server
+let server = VstpServer::bind_tcp("127.0.0.1:8080").await?;
+server.serve(|msg: Message| async move {
+    println!("Got message: {}", msg.content);
+    Ok(msg) // Echo the message back
+}).await?;
+
+// Client
+let client = VstpClient::connect_tcp("127.0.0.1:8080").await?;
+client.send(Message { content: "Hello!".to_string() }).await?;
+let response: Message = client.receive().await?;`}</code>
                 </pre>
 
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 my-6">
                   <h4 className="text-blue-900 dark:text-blue-100 font-semibold mb-2">
-                    💡 Note
+                    💡 Key Features
                   </h4>
-                  <p className="text-blue-700 dark:text-blue-200">
-                    VSTP is built on top of Tokio for async I/O operations. Make
-                    sure you have the <code>tokio</code> runtime available in
-                    your project.
-                  </p>
+                  <ul className="text-blue-700 dark:text-blue-200 list-disc list-inside">
+                    <li>Automatic serialization/deserialization</li>
+                    <li>Type-safe message passing</li>
+                    <li>Built-in error handling</li>
+                    <li>Timeouts and retries</li>
+                  </ul>
                 </div>
               </section>
 
-              <section id="first-frame">
-                <h2>Your First Frame</h2>
+              <section id="tcp-example">
+                <h2>TCP Example: Chat Server</h2>
                 <p>
-                  Let's start by creating and working with VSTP frames. A frame
-                  is the basic unit of communication in VSTP.
-                </p>
-
-                <h3>Creating a Simple Frame</h3>
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`use vstp::{Frame, FrameType, Flags};
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create a new data frame
-    let frame = Frame::new(FrameType::Data)
-        .with_header("content-type", "text/plain")
-        .with_header("user-id", "12345")
-        .with_payload(b"Hello, VSTP!".to_vec())
-        .with_flag(Flags::REQ_ACK);
-
-    println!("Created frame: {:?}", frame);
-    Ok(())
-}`}</code>
-                </pre>
-
-                <h3>Encoding and Decoding</h3>
-                <p>
-                  Frames can be encoded to bytes for transmission and decoded
-                  back to frames:
+                  Here's a complete example of a chat server using TCP with
+                  automatic message routing:
                 </p>
 
                 <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`use vstp::{Frame, FrameType, frame};
-use bytes::BytesMut;
+                  <code>{`use serde::{Serialize, Deserialize};
+use vstp::easy::{VstpClient, VstpServer};
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create a frame
-    let original_frame = Frame::new(FrameType::Data)
-        .with_payload(b"Hello, World!".to_vec());
+#[derive(Serialize, Deserialize)]
+struct ChatMessage {
+    from: String,
+    content: String,
+}
 
-    // Encode to bytes
-    let encoded = frame::encode_frame(&original_frame)?;
-    println!("Encoded {} bytes", encoded.len());
-
-    // Decode back to frame
-    let mut buf = BytesMut::from(&encoded[..]);
-    let decoded_frame = frame::try_decode_frame(&mut buf, 1024)?.unwrap();
-
-    // Verify they're the same
-    assert_eq!(original_frame, decoded_frame);
-    println!("Frame round-trip successful!");
+// Chat Server
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let server = VstpServer::bind_tcp("127.0.0.1:8080").await?;
+    println!("Chat server running on 127.0.0.1:8080");
     
+    server.serve(|msg: ChatMessage| async move {
+        println!("{}: {}", msg.from, msg.content);
+        Ok(msg) // Broadcast message back to all clients
+    }).await?;
+
+    Ok(())
+}
+
+// Chat Client
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = VstpClient::connect_tcp("127.0.0.1:8080").await?;
+    
+    // Send a message
+    let msg = ChatMessage {
+        from: "Alice".to_string(),
+        content: "Hello everyone!".to_string(),
+    };
+    client.send(msg).await?;
+    
+    // Receive messages
+    while let Ok(msg) = client.receive::<ChatMessage>().await {
+        println!("{}: {}", msg.from, msg.content);
+    }
+
     Ok(())
 }`}</code>
                 </pre>
               </section>
 
-              <section id="tcp-example">
-                <h2>TCP Example: Echo Server</h2>
+              <section id="udp-example">
+                <h2>UDP Example: Real-time Data</h2>
                 <p>
-                  Let's build a simple echo server that receives messages and
-                  sends them back. This demonstrates the basic TCP client-server
-                  pattern with VSTP.
+                  For real-time applications, you can use UDP mode. The API
+                  remains the same:
                 </p>
 
-                <h3>TCP Server</h3>
                 <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`use vstp::{Frame, FrameType, VstpTcpServer};
-use tokio;
+                  <code>{`use serde::{Serialize, Deserialize};
+use vstp::easy::{VstpClient, VstpServer};
 
+#[derive(Serialize, Deserialize)]
+struct SensorData {
+    sensor_id: String,
+    temperature: f32,
+    humidity: f32,
+}
+
+// UDP Server
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Bind to localhost:8080
-    let server = VstpTcpServer::bind("127.0.0.1:8080").await?;
-    println!("Echo server listening on 127.0.0.1:8080");
+    let server = VstpServer::bind_udp("127.0.0.1:8080").await?;
+    
+    server.serve(|data: SensorData| async move {
+        println!("Sensor {}: {}°C, {}%", data.sensor_id, data.temperature, data.humidity);
+        Ok(data)
+    }).await?;
 
-    while let Ok((mut connection, addr)) = server.accept().await {
-        println!("New client connected: {}", addr);
-        
-        // Handle each connection in a separate task
-        tokio::spawn(async move {
-            while let Ok(frame) = connection.read_frame().await {
-                match frame.frame_type() {
-                    FrameType::Data => {
-                        println!("Echoing: {:?}", frame);
-                        // Echo the frame back to the client
-                        if let Err(e) = connection.send_frame(&frame).await {
-                            println!("Error sending frame: {}", e);
-                            break;
-                        }
-                    }
-                    FrameType::Bye => {
-                        println!("Client {} said goodbye", addr);
-                        break;
-                    }
-                    _ => {
-                        println!("Received frame type: {:?}", frame.frame_type());
-                    }
-                }
-            }
-            println!("Client {} disconnected", addr);
-        });
+    Ok(())
+}
+
+// UDP Client
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = VstpClient::connect_udp("127.0.0.1:8080").await?;
+    
+    // Send data periodically
+    loop {
+        let data = SensorData {
+            sensor_id: "sensor1".to_string(),
+            temperature: 25.5,
+            humidity: 60.0,
+        };
+        client.send(data).await?;
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
     }
-    
-    Ok(())
-}`}</code>
-                </pre>
-
-                <h3>TCP Client</h3>
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`use vstp::{Frame, FrameType, VstpTcpClient};
-use tokio::io::{self, AsyncBufReadExt};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Connect to the server
-    let mut client = VstpTcpClient::connect("127.0.0.1:8080").await?;
-    println!("Connected to echo server");
-
-    // Send a test message
-    let test_frame = Frame::new(FrameType::Data)
-        .with_header("content-type", "text/plain")
-        .with_payload(b"Hello from client!".to_vec());
-    
-    client.send_frame(&test_frame).await?;
-    println!("Sent: {:?}", test_frame);
-
-    // Read the echo response
-    let response = client.read_frame().await?;
-    println!("Received echo: {:?}", response);
-
-    // Send goodbye
-    let bye_frame = Frame::new(FrameType::Bye);
-    client.send_frame(&bye_frame).await?;
-    println!("Sent goodbye");
-
-    Ok(())
 }`}</code>
                 </pre>
 
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 my-6">
                   <h4 className="text-green-900 dark:text-green-100 font-semibold mb-2">
-                    🚀 Try It Out
+                    🚀 Performance Tip
                   </h4>
                   <p className="text-green-700 dark:text-green-200">
-                    Save the server code as <code>echo_server.rs</code> and the
-                    client code as <code>echo_client.rs</code>. Run the server
-                    first, then the client to see the echo in action!
+                    UDP mode is perfect for real-time applications where low
+                    latency is crucial. VSTP handles packet fragmentation and
+                    reassembly automatically.
                   </p>
                 </div>
-              </section>
-
-              <section id="udp-example">
-                <h2>UDP Example: Simple Message Exchange</h2>
-                <p>
-                  UDP provides a connectionless, fast transport option. Here's a
-                  simple example of UDP communication with VSTP.
-                </p>
-
-                <h3>UDP Server</h3>
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`use vstp::{Frame, FrameType, VstpUdpServer};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Bind to localhost:8080
-    let server = VstpUdpServer::bind("127.0.0.1:8080").await?;
-    println!("UDP server listening on 127.0.0.1:8080");
-
-    while let Ok((frame, addr)) = server.recv_frame().await {
-        println!("Received from {}: {:?}", addr, frame);
-        
-        // Send a response back
-        let response = Frame::new(FrameType::Data)
-            .with_header("response", "ack")
-            .with_payload(b"Message received!".to_vec());
-        
-        server.send_frame(&response, addr).await?;
-        println!("Sent response to {}", addr);
-    }
-    
-    Ok(())
-}`}</code>
-                </pre>
-
-                <h3>UDP Client</h3>
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`use vstp::{Frame, FrameType, VstpUdpClient};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Bind to any available port
-    let client = VstpUdpClient::bind("0.0.0.0:0").await?;
-    println!("UDP client ready");
-
-    // Send a message to the server
-    let message = Frame::new(FrameType::Data)
-        .with_header("client-id", "udp-client-1")
-        .with_payload(b"Hello UDP server!".to_vec());
-    
-    client.send_frame(&message, "127.0.0.1:8080").await?;
-    println!("Sent: {:?}", message);
-
-    // Wait for response
-    let (response, server_addr) = client.recv_frame().await?;
-    println!("Received from {}: {:?}", server_addr, response);
-
-    Ok(())
-}`}</code>
-                </pre>
               </section>
 
               <section id="next-steps">
                 <h2>Next Steps</h2>
                 <p>
-                  Congratulations! You've successfully created your first VSTP
-                  applications. Here's what you can explore next:
+                  Now that you've seen the basics, here are some resources to
+                  help you build more complex applications:
                 </p>
 
-                <ul>
-                  <li>
-                    <Link
-                      href="/docs/protocol"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Protocol Specification
-                    </Link>{" "}
-                    - Learn about the wire format and protocol details
-                  </li>
-                  <li>
-                    <Link
-                      href="/docs/api"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      API Reference
-                    </Link>{" "}
-                    - Complete documentation of all VSTP APIs
-                  </li>
-                  <li>
-                    <Link
-                      href="/docs/tutorials"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Tutorials
-                    </Link>{" "}
-                    - Step-by-step guides for common use cases
-                  </li>
-                  <li>
-                    <Link
-                      href="/docs/examples"
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Examples
-                    </Link>{" "}
-                    - More complex examples and real-world applications
-                  </li>
-                </ul>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <Link
+                    href="/docs/api"
+                    className="block p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <h3 className="font-semibold mb-2">📚 API Reference</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Complete documentation of all VSTP features and options.
+                    </p>
+                  </Link>
 
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 my-6">
-                  <h4 className="text-yellow-900 dark:text-yellow-100 font-semibold mb-2">
-                    💡 Pro Tip
-                  </h4>
-                  <p className="text-yellow-700 dark:text-yellow-200">
-                    Start with the TCP examples for reliable communication, then
-                    explore UDP for high-performance scenarios where some packet
-                    loss is acceptable.
-                  </p>
+                  <Link
+                    href="/docs/examples"
+                    className="block p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <h3 className="font-semibold mb-2">💡 Examples</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Real-world examples and common patterns.
+                    </p>
+                  </Link>
+
+                  <Link
+                    href="/docs/best-practices"
+                    className="block p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <h3 className="font-semibold mb-2">✨ Best Practices</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Tips and tricks for building robust applications.
+                    </p>
+                  </Link>
+
+                  <Link
+                    href="/docs/troubleshooting"
+                    className="block p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    <h3 className="font-semibold mb-2">🔧 Troubleshooting</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Common issues and how to solve them.
+                    </p>
+                  </Link>
                 </div>
               </section>
             </div>

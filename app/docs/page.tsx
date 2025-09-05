@@ -63,6 +63,14 @@ export default function DocsHome() {
                 </li>
                 <li>
                   <Link
+                    href="/docs/migration"
+                    className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
+                  >
+                    Migration Guide
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/docs/troubleshooting"
                     className="block px-3 py-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
                   >
@@ -75,16 +83,21 @@ export default function DocsHome() {
 
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">
-              VSTP Documentation
-            </h1>
+            <div className="flex items-center justify-between mb-8">
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+                VSTP Documentation
+              </h1>
+              <span className="px-3 py-1 text-sm font-medium text-green-800 bg-green-100 dark:text-green-100 dark:bg-green-800 rounded-full">
+                v0.2.1
+              </span>
+            </div>
 
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                Welcome to the comprehensive documentation for Vishu's Secure
-                Transfer Protocol (VSTP). This documentation will guide you
-                through everything you need to know to implement and use VSTP
-                effectively.
+                Welcome to VSTP (Vishu's Secure Transfer Protocol) - a modern,
+                high-performance protocol designed for secure and efficient data
+                transfer. Version 0.2.1 introduces a simplified API that makes
+                it easier than ever to build robust networked applications.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -93,8 +106,8 @@ export default function DocsHome() {
                     🚀 Quick Start
                   </h3>
                   <p className="text-blue-700 dark:text-blue-200 mb-4">
-                    Get up and running with VSTP in minutes. Perfect for
-                    beginners.
+                    Get started in minutes with our new simplified API. Perfect
+                    for both beginners and experienced developers.
                   </p>
                   <Link
                     href="/docs/getting-started"
@@ -109,7 +122,8 @@ export default function DocsHome() {
                     📚 Protocol Spec
                   </h3>
                   <p className="text-green-700 dark:text-green-200 mb-4">
-                    Deep dive into the protocol specification and wire format.
+                    Deep dive into the protocol specification, wire format, and
+                    security features.
                   </p>
                   <Link
                     href="/docs/protocol"
@@ -124,7 +138,8 @@ export default function DocsHome() {
                     🛠️ API Reference
                   </h3>
                   <p className="text-purple-700 dark:text-purple-200 mb-4">
-                    Complete API documentation with examples and usage patterns.
+                    Comprehensive API documentation with examples and best
+                    practices.
                   </p>
                   <Link
                     href="/docs/api"
@@ -139,7 +154,8 @@ export default function DocsHome() {
                     🎯 Tutorials
                   </h3>
                   <p className="text-orange-700 dark:text-orange-200 mb-4">
-                    Step-by-step tutorials for common use cases and patterns.
+                    Step-by-step tutorials and real-world examples using the new
+                    simplified API.
                   </p>
                   <Link
                     href="/docs/tutorials"
@@ -150,51 +166,133 @@ export default function DocsHome() {
                 </div>
               </div>
 
-              <h2>What is VSTP?</h2>
-              <p>
-                VSTP (Vishu's Secure Transfer Protocol) is a general-purpose,
-                binary, extensible application-layer protocol designed to be
-                secure, fast, and easy to implement. It provides a clean
-                abstraction over TCP and UDP transports with built-in security
-                features.
-              </p>
+              <h2>What's New in v0.2.1?</h2>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-8">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <div>
+                      <strong>Simplified High-Level API</strong>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        New easy-to-use API with automatic serialization,
+                        deserialization, and error handling.
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <div>
+                      <strong>Unified TCP/UDP Interface</strong>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Same API for both TCP and UDP, making it easy to switch
+                        between transport protocols.
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <div>
+                      <strong>Improved Error Handling</strong>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Better error messages, automatic recovery, and timeout
+                        handling.
+                      </p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">✓</span>
+                    <div>
+                      <strong>Message Routing</strong>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Built-in support for message routing and handling in
+                        servers.
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
 
-              <h3>Key Features</h3>
+              <h2>Key Features</h2>
               <ul>
+                <li>
+                  <strong>Type-Safe Communication:</strong> Automatic
+                  serialization/deserialization of Rust types
+                </li>
                 <li>
                   <strong>Secure by Default:</strong> Built-in TLS 1.3 support
                   for TCP connections
                 </li>
                 <li>
-                  <strong>Fast UDP Mode:</strong> Optimized for speed with UDP
-                  transport
+                  <strong>High Performance:</strong> Optimized UDP mode for
+                  real-time applications
                 </li>
                 <li>
-                  <strong>Binary Protocol:</strong> Efficient wire format with
-                  minimal overhead
+                  <strong>Reliable:</strong> Automatic retries, acknowledgments,
+                  and error recovery
                 </li>
                 <li>
-                  <strong>Extensible:</strong> Custom headers and payload types
+                  <strong>Easy to Use:</strong> Simple, intuitive API with
+                  excellent documentation
                 </li>
                 <li>
-                  <strong>Cross-Platform:</strong> Easy to implement in any
-                  programming language
-                </li>
-                <li>
-                  <strong>Reliable:</strong> Built-in error handling and
-                  acknowledgment system
+                  <strong>Flexible:</strong> Support for both structured and raw
+                  message formats
                 </li>
               </ul>
 
-              <h3>Use Cases</h3>
-              <ul>
-                <li>Real-time communication applications</li>
-                <li>File transfer systems</li>
-                <li>IoT device communication</li>
-                <li>Gaming and streaming applications</li>
-                <li>Microservices communication</li>
-                <li>Custom protocol implementations</li>
-              </ul>
+              <h2>Common Use Cases</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <h3 className="font-semibold mb-2">
+                    Real-time Communication
+                  </h3>
+                  <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
+                    <li>Chat applications</li>
+                    <li>Game networking</li>
+                    <li>Live streaming</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <h3 className="font-semibold mb-2">Data Transfer</h3>
+                  <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
+                    <li>File transfer</li>
+                    <li>Backup systems</li>
+                    <li>Content distribution</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <h3 className="font-semibold mb-2">IoT & Edge Computing</h3>
+                  <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
+                    <li>Device communication</li>
+                    <li>Sensor networks</li>
+                    <li>Remote monitoring</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <h3 className="font-semibold mb-2">Microservices</h3>
+                  <ul className="list-disc list-inside text-gray-600 dark:text-gray-300">
+                    <li>Service communication</li>
+                    <li>Event streaming</li>
+                    <li>Load balancing</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <h2 className="text-xl font-semibold text-blue-900 dark:text-blue-100 mb-4">
+                  Ready to Get Started?
+                </h2>
+                <p className="text-blue-700 dark:text-blue-200 mb-4">
+                  Check out our quick start guide to begin building with VSTP in
+                  minutes.
+                </p>
+                <Link
+                  href="/docs/getting-started"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Quick Start Guide →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
