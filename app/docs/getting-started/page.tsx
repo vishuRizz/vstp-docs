@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import CodeWithCopy from "../../components/CodeWithCopy";
 
 export default function GettingStarted() {
   return (
@@ -82,12 +83,12 @@ export default function GettingStarted() {
                   <code>Cargo.toml</code>:
                 </p>
 
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`[dependencies]
+                <CodeWithCopy className="bg-gray-900 p-4 rounded-lg">
+                  {`[dependencies]
 vstp = "0.2.1"
 tokio = { version = "1.0", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }`}</code>
-                </pre>
+serde = { version = "1.0", features = ["derive"] }`}
+                </CodeWithCopy>
               </section>
 
               <section id="basic-usage">
@@ -97,8 +98,8 @@ serde = { version = "1.0", features = ["derive"] }`}</code>
                   messages. Here's a simple example:
                 </p>
 
-                <pre className="bg-gray-900 p-4 rounded-lg">
-                  <code>{`use serde::{Serialize, Deserialize};
+                <CodeWithCopy className="bg-gray-900 p-4 rounded-lg">
+                  {`use serde::{Serialize, Deserialize};
 use vstp::easy::{VstpClient, VstpServer};
 
 #[derive(Serialize, Deserialize)]
@@ -116,8 +117,8 @@ server.serve(|msg: Message| async move {
 // Client
 let client = VstpClient::connect_tcp("127.0.0.1:8080").await?;
 client.send(Message { content: "Hello!".to_string() }).await?;
-let response: Message = client.receive().await?;`}</code>
-                </pre>
+let response: Message = client.receive().await?;`}
+                </CodeWithCopy>
 
                 <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 my-6">
                   <h4 className="text-blue-900 dark:text-blue-100 font-semibold mb-2">
